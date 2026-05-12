@@ -1,212 +1,111 @@
 <!DOCTYPE html>
-     2 <html lang="es">
-     3 <head>
-     4     <meta charset="UTF-8">
-     5     <meta name="viewport" content="width=1920, height=1080,
-       initial-scale=1.0">
-     6     <title>CineStream PS4 - Hub de Streaming</title>
-     7     <style>
-     8         :root {
-     9             --primary: #E50914; /* Rojo Cine */
-    10             --bg: #0A0A0A;
-    11             --card-bg: #1A1A1A;
-    12             --text: #F5F5F5;
-    13             --section-title: #FFD700;
-    14         }
-    15         body { 
-    16             background-color: var(--bg); 
-    17             color: var(--text); 
-    18             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    19             margin: 0; 
-    20             padding: 40px; 
-    21             overflow-x: hidden;
-    22         }
-    23         header { 
-    24             border-bottom: 3px solid var(--primary); 
-    25             padding-bottom: 15px; 
-    26             margin-bottom: 40px; 
-    27             text-align: center; 
-    28         }
-    29         h1 { 
-    30             margin: 0; 
-    31             font-size: 3.5rem; 
-    32             text-transform: uppercase; 
-    33             letter-spacing: 8px; 
-    34             color: var(--primary);
-    35             text-shadow: 2px 2px 10px rgba(229, 9, 20, 0.5);
-    36         }
-    37         
-    38         .section-header { 
-    39             color: var(--section-title); 
-    40             font-size: 2rem; 
-    41             margin: 50px 0 25px 0; 
-    42             border-left: 6px solid var(--primary); 
-    43             padding-left: 20px;
-    44             text-transform: uppercase;
-    45         }
-    46         
-    47         .container { 
-    48             display: flex; 
-    49             gap: 25px; 
-    50             flex-wrap: wrap; 
-    51             justify-content: flex-start; 
-    52         }
-    53         
-    54         .site-card {
-    55             background: var(--card-bg);
-    56             width: 260px;
-    57             padding: 20px;
-    58             border-radius: 15px;
-    59             text-decoration: none;
-    60             color: white;
-    61             transition: all 0.25s ease-in-out;
-    62             border: 3px solid transparent;
-    63             text-align: center;
-    64             display: flex;
-    65             flex-direction: column;
-    66             align-items: center;
-    67         }
-    68         
-    69         /* Efecto cuando seleccionas con el mando */
-    70         .site-card.active { 
-    71             border-color: var(--primary); 
-    72             transform: scale(1.1); 
-    73             background: #252525; 
-    74             box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); 
-    75             z-index: 10;
-    76         }
-    77         
-    78         .site-card img { 
-    79             width: 100px; 
-    80             height: 100px; 
-    81             border-radius: 50%; 
-    82             margin-bottom: 15px; 
-    83             background: #333;
-    84             border: 2px solid #444;
-    85         }
-    86         
-    87         .site-card h2 { 
-    88             margin: 10px 0; 
-    89             font-size: 1.4rem; 
-    90         }
-    91
-    92         .controls-hint { 
-    93             position: fixed; 
-    94             bottom: 30px; 
-    95             right: 50px; 
-    96             background: rgba(0,0,0,0.8); 
-    97             padding: 15px 35px; 
-    98             border-radius: 50px; 
-    99             font-size: 1.1rem; 
-   100             border: 1px solid var(--primary);
-   101             color: white;
-   102         }
-   103     </style>
-   104 </head>
-   105 <body>
-   106
-   107     <header>
-   108         <h1>CineStream PS4</h1>
-   109     </header>
-   110
-   111     <div class="section-header">HDFull - Dominios Espejo</div>
-   112     <div class="container" id="hdfull-container"></div>
-   113
-   114     <div class="section-header">Películas y Series (Español)</div>
-   115     <div class="container" id="spanish-container"></div>
-   116
-   117     <div class="section-header">Cinéma Français</div>
-   118     <div class="container" id="french-container"></div>
-   119
-   120     <div class="controls-hint">
-   121         <b>Cruceta</b>: Navegar | <b>X</b>: Entrar
-   122     </div>
-   123
-   124     <script>
-   125         const sections = {
-   126             hdfull: [
-   127                 { name: 'HDFull .org', url: 'https://hdfull.org', icon:
-       'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
-   128                 { name: 'HDFull .io', url: 'https://hdfull.io', icon:
-       'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
-   129                 { name: 'HDFull .me', url: 'https://hdfull.me', icon:
-       'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' }
-   130             ],
-   131             spanish: [
-   132                 { name: 'Cuevana 3', url: 'https://cuevana.biz', icon:
-       'https://cdn-icons-png.flaticon.com/512/705/705062.png' },
-   133                 { name: 'PelisPlus', url: 'https://pelisplus.so', icon:
-       'https://cdn-icons-png.flaticon.com/512/4221/4221419.png' },
-   134                 { name: 'Gnula', url: 'https://gnula.nu', icon:
-       'https://cdn-icons-png.flaticon.com/512/2589/2589304.png' },
-   135                 { name: 'AnimeFLV', url: 'https://animeflv.net', icon:
-       'https://cdn-icons-png.flaticon.com/512/10433/10433048.png' },
-   136                 { name: 'SeriesPapaya', url: 'https://seriespapaya.nu',
-       icon: 'https://cdn-icons-png.flaticon.com/512/1179/1179069.png' }
-   137             ],
-   138             french: [
-   139                 { name: 'Votark', url: 'https://votark.com', icon:
-       'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
-   140             ]
-   141         };
-   142
-   143         let currentSection = 'hdfull';
-   144         let currentIndex = 0;
-   145         const sectionOrder = ['hdfull', 'spanish', 'french'];
-   146
-   147         function renderAll() {
-   148             sectionOrder.forEach(secId => {
-   149                 const container = document.getElementById(secId +
-       '-container');
-   150                 container.innerHTML = '';
-   151                 sections[secId].forEach((site, index) => {
-   152                     const card = document.createElement('div');
-   153                     card.className = 'site-card' + (currentSection ===
-       secId && index === currentIndex ? ' active' : '');
-   154                     card.innerHTML = `
-   155                         <img src="${site.icon}">
-   156                         <h2>${site.name}</h2>
-   157                     `;
-   158                     container.appendChild(card);
-   159                 });
-   160             });
-   161             // Auto-scroll para no perder el foco
-   162             const activeCard = document.querySelector('.active');
-   163             if (activeCard) {
-   164                 activeCard.scrollIntoView({ behavior: 'smooth', block:
-       'center' });
-   165             }
-   166         }
-   167
-   168         document.addEventListener('keydown', (e) => {
-   169             const currentList = sections[currentSection];
-   170             
-   171             if (e.key === 'ArrowRight') {
-   172                 currentIndex = (currentIndex + 1) % currentList.length;
-   173             } else if (e.key === 'ArrowLeft') {
-   174                 currentIndex = (currentIndex - 1 + currentList.length) %
-       currentList.length;
-   175             } else if (e.key === 'ArrowDown') {
-   176                 let secIdx = sectionOrder.indexOf(currentSection);
-   177                 if (secIdx < sectionOrder.length - 1) {
-   178                     currentSection = sectionOrder[secIdx + 1];
-   179                     currentIndex = 0;
-   180                 }
-   181             } else if (e.key === 'ArrowUp') {
-   182                 let secIdx = sectionOrder.indexOf(currentSection);
-   183                 if (secIdx > 0) {
-   184                     currentSection = sectionOrder[secIdx - 1];
-   185                     currentIndex = 0;
-   186                 }
-   187             } else if (e.key === 'Enter' || e.key === 'x' || e.key ===
-       'X') {
-   188                 window.location.href = currentList[currentIndex].url;
-   189             }
-   190             renderAll();
-   191         });
-   192
-   193         renderAll();
-   194     </script>
-   195 </body>
-   196 </html>
-
+    2 <html lang="es">
+    3 <head>
+    4     <meta charset="UTF-8">
+    5     <meta name="viewport" content="width=1920, height=1080,
+      initial-scale=1.0">
+    6     <title>CineStream PS4</title>
+    7     <style>
+    8         :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A;
+      --text: #F5F5F5; --section-title: #FFD700; }
+    9         body { background-color: var(--bg); color: var(--text);
+      font-family: sans-serif; margin: 0; padding: 40px; overflow-x: hidden; }
+   10         header { border-bottom: 3px solid var(--primary); padding-bottom:
+      15px; margin-bottom: 40px; text-align: center; }
+   11         h1 { margin: 0; font-size: 3.5rem; text-transform: uppercase;
+      letter-spacing: 8px; color: var(--primary); }
+   12         .section-header { color: var(--section-title); font-size: 2rem;
+      margin: 50px 0 25px 0; border-left: 6px solid var(--primary);
+      padding-left: 20px; }
+   13         .container { display: flex; gap: 25px; flex-wrap: wrap; }
+   14         .site-card { background: var(--card-bg); width: 260px; padding:
+      20px; border-radius: 15px; text-decoration: none; color: white; border:
+      3px solid transparent; text-align: center; display: flex; flex-direction:
+      column; align-items: center; transition: 0.2s; }
+   15         .site-card.active { border-color: var(--primary); transform:
+      scale(1.1); background: #252525; box-shadow: 0 15px 30px rgba(229, 9, 20,
+      0.4); }
+   16         .site-card img { width: 100px; height: 100px; border-radius: 50%;
+      margin-bottom: 15px; background: #333; }
+   17         .controls-hint { position: fixed; bottom: 30px; right: 50px;
+      background: rgba(0,0,0,0.8); padding: 15px 35px; border-radius: 50px;
+      border: 1px solid var(--primary); }
+   18     </style>
+   19 </head>
+   20 <body>
+   21     <header><h1>CineStream PS4</h1></header>
+   22     <div class="section-header">HDFull - Dominios Espejo</div>
+   23     <div class="container" id="hdfull-container"></div>
+   24     <div class="section-header">Películas y Series (Español)</div>
+   25     <div class="container" id="spanish-container"></div>
+   26     <div class="section-header">Cinéma Français</div>
+   27     <div class="container" id="french-container"></div>
+   28     <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>X</b>:
+      Entrar</div>
+   29     <script>
+   30         const sections = {
+   31             hdfull: [
+   32                 { name: 'HDFull .org', url: 'https://hdfull.org', icon:
+      'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
+   33                 { name: 'HDFull .io', url: 'https://hdfull.io', icon:
+      'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
+   34                 { name: 'HDFull .me', url: 'https://hdfull.me', icon:
+      'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' }
+   35             ],
+   36             spanish: [
+   37                 { name: 'Cuevana 3', url: 'https://cuevana.biz', icon:
+      'https://cdn-icons-png.flaticon.com/512/705/705062.png' },
+   38                 { name: 'PelisPlus', url: 'https://pelisplus.so', icon:
+      'https://cdn-icons-png.flaticon.com/512/4221/4221419.png' },
+   39                 { name: 'Gnula', url: 'https://gnula.nu', icon:
+      'https://cdn-icons-png.flaticon.com/512/2589/2589304.png' },
+   40                 { name: 'AnimeFLV', url: 'https://animeflv.net', icon:
+      'https://cdn-icons-png.flaticon.com/512/10433/10433048.png' }
+   41             ],
+   42             french: [
+   43                 { name: 'Votark', url: 'https://votark.com', icon:
+      'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
+   44             ]
+   45         };
+   46         let currentSection = 'hdfull', currentIndex = 0;
+   47         const sectionOrder = ['hdfull', 'spanish', 'french'];
+   48         function renderAll() {
+   49             sectionOrder.forEach(secId => {
+   50                 const container = document.getElementById(secId +
+      '-container');
+   51                 container.innerHTML = '';
+   52                 sections[secId].forEach((site, index) => {
+   53                     const card = document.createElement('div');
+   54                     card.className = 'site-card' + (currentSection ===
+      secId && index === currentIndex ? ' active' : '');
+   55                     card.innerHTML = `<img
+      src="${site.icon}"><h2>${site.name}</h2>`;
+   56                     container.appendChild(card);
+   57                 });
+   58             });
+   59             const activeCard = document.querySelector('.active');
+   60             if (activeCard) activeCard.scrollIntoView({ behavior:
+      'smooth', block: 'center' });
+   61         }
+   62         document.addEventListener('keydown', (e) => {
+   63             const currentList = sections[currentSection];
+   64             if (e.key === 'ArrowRight') currentIndex = (currentIndex + 1)
+      % currentList.length;
+   65             else if (e.key === 'ArrowLeft') currentIndex = (currentIndex -
+      1 + currentList.length) % currentList.length;
+   66             else if (e.key === 'ArrowDown') {
+   67                 let idx = sectionOrder.indexOf(currentSection);
+   68                 if (idx < sectionOrder.length - 1) { currentSection =
+      sectionOrder[idx + 1]; currentIndex = 0; }
+   69             } else if (e.key === 'ArrowUp') {
+   70                 let idx = sectionOrder.indexOf(currentSection);
+   71                 if (idx > 0) { currentSection = sectionOrder[idx - 1];
+      currentIndex = 0; }
+   72             } else if (e.key === 'Enter' || e.key === 'x' || e.key ===
+      'X') window.location.href = currentList[currentIndex].url;
+   73             renderAll();
+   74         });
+   75         renderAll();
+   76     </script>
+   77 </body>
+   78 </html>
