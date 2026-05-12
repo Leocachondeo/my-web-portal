@@ -11,7 +11,7 @@
         h1 { margin: 0; font-size: 3.5rem; text-transform: uppercase; letter-spacing: 8px; color: var(--primary); }
         .section-header { color: var(--section-title); font-size: 2rem; margin: 50px 0 25px 0; border-left: 6px solid var(--primary); padding-left: 20px; }
         .container { display: flex; gap: 25px; flex-wrap: wrap; }
-        .site-card { background: var(--card-bg); width: 260px; padding: 20px; border-radius: 15px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
+        .site-card { background: var(--card-bg); width: 260px; padding: 20px; border-radius: 15px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.15s; }
         .site-card.active { border-color: var(--primary); transform: scale(1.1); background: #252525; box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); }
         .site-card img { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px; background: #333; }
         .controls-hint { position: fixed; bottom: 30px; right: 50px; background: rgba(0,0,0,0.8); padding: 15px 35px; border-radius: 50px; border: 1px solid var(--primary); }
@@ -19,13 +19,21 @@
 </head>
 <body>
     <header><h1>CineStream PS4</h1></header>
+    
     <div class="section-header">HDFull - Dominios Espejo</div>
     <div class="container" id="hdfull-container"></div>
+    
     <div class="section-header">Películas y Series (Español)</div>
     <div class="container" id="spanish-container"></div>
+
     <div class="section-header">Cinéma Français</div>
     <div class="container" id="french-container"></div>
-    <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>X</b>: Entrar</div>
+
+    <div class="section-header">Reproductores Directos</div>
+    <div class="container" id="player-container"></div>
+
+    <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>X / Enter</b>: Entrar</div>
+
     <script>
         const sections = {
             hdfull: [
@@ -41,10 +49,16 @@
             ],
             french: [
                 { name: 'Votark', url: 'https://votark.com', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
+            ],
+            player: [
+                { name: 'YouTube', url: 'https://youtube.com/tv', icon: 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png' },
+                { name: 'Twitch', url: 'https://twitch.tv', icon: 'https://cdn-icons-png.flaticon.com/512/5968/5968819.png' }
             ]
         };
+
         let currentSection = 'hdfull', currentIndex = 0;
-        const sectionOrder = ['hdfull', 'spanish', 'french'];
+        const sectionOrder = ['hdfull', 'spanish', 'french', 'player'];
+
         function renderAll() {
             sectionOrder.forEach(secId => {
                 const container = document.getElementById(secId + '-container');
@@ -59,19 +73,30 @@
             const activeCard = document.querySelector('.active');
             if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+
+        // Mapeo de teclas PS4 y PC
         document.addEventListener('keydown', (e) => {
             const currentList = sections[currentSection];
-            if (e.key === 'ArrowRight') currentIndex = (currentIndex + 1) % currentList.length;
-            else if (e.key === 'ArrowLeft') currentIndex = (currentIndex - 1 + currentList.length) % currentList.length;
-            else if (e.key === 'ArrowDown') {
+            const keyCode = e.keyCode || e.which;
+
+            // Navegación (Cruceta o Flechas)
+            if (keyCode === 39) currentIndex = (currentIndex + 1) % currentList.length; // Derecha
+            else if (keyCode === 37) currentIndex = (currentIndex - 1 + currentList.length) % currentList.length; // Izquierda
+            else if (keyCode === 40) { // Abajo
                 let idx = sectionOrder.indexOf(currentSection);
                 if (idx < sectionOrder.length - 1) { currentSection = sectionOrder[idx + 1]; currentIndex = 0; }
-            } else if (e.key === 'ArrowUp') {
+            } else if (keyCode === 38) { // Arriba
                 let idx = sectionOrder.indexOf(currentSection);
                 if (idx > 0) { currentSection = sectionOrder[idx - 1]; currentIndex = 0; }
-            } else if (e.key === 'Enter' || e.key === 'x' || e.key === 'X') window.location.href = currentList[currentIndex].url;
+            } 
+            // Botón X de PS4 (Suele ser 13 o 0 dependiendo del modo del navegador)
+            else if (keyCode === 13 || keyCode === 0) { 
+                window.location.href = currentList[currentIndex].url;
+            }
+            
             renderAll();
         });
+
         renderAll();
     </script>
 </body>
