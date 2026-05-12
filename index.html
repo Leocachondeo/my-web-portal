@@ -4,166 +4,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
-    <title>CineStream PS4 - Portal Premium</title>
+    <title>CineStream PS4 - Privado y Automático</title>
     <style>
-        :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A; --text: #F5F5F5; --mobile: #27AE60; --debrid: #00CCFF; --vpn: #00FF99; --iptv: #FFA500; }
+        :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A; --text: #F5F5F5; --vpn: #00FF99; --iptv: #FFA500; }
         body { background-color: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 40px; overflow-y: auto; }
-        header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 40px; text-align: center; }
-        h1 { margin: 0; font-size: 3.5rem; text-transform: uppercase; letter-spacing: 8px; color: var(--primary); }
+        
+        header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 40px; display: flex; align-items: center; justify-content: space-between; }
+        h1 { margin: 0; font-size: 2.5rem; text-transform: uppercase; letter-spacing: 5px; color: var(--primary); flex-grow: 1; text-align: center; }
+        
+        .nav-btn { background: #222; color: white; text-decoration: none; padding: 12px 25px; border-radius: 10px; border: 1px solid #444; font-weight: bold; font-size: 1.1rem; }
+        .nav-btn.active { border-color: var(--primary); background: #333; box-shadow: 0 0 15px rgba(229, 9, 20, 0.5); }
+        .nav-btn.sync { border-color: var(--vpn); color: var(--vpn); }
+
         .section-header { color: #FFD700; font-size: 2rem; margin: 50px 0 25px 0; border-left: 6px solid var(--primary); padding-left: 20px; text-transform: uppercase; }
         .container { display: flex; gap: 25px; flex-wrap: wrap; }
-        .site-card { background: var(--card-bg); width: 320px; padding: 30px; border-radius: 15px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.1s; cursor: pointer; position: relative; }
+        
+        .site-card { background: var(--card-bg); width: 320px; padding: 30px; border-radius: 15px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.1s; cursor: pointer; }
         .site-card.active { border-color: var(--primary); transform: scale(1.05); background: #222; box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); z-index: 10; }
-        .site-card.vpn-card.active { border-color: var(--vpn); box-shadow: 0 15px 30px rgba(0, 255, 153, 0.5); }
-        .site-card.iptv-card.active { border-color: var(--iptv); box-shadow: 0 15px 30px rgba(255, 165, 0, 0.5); }
-        .site-card img { width: 120px; height: 120px; border-radius: 50%; margin-bottom: 15px; background: #333; }
         
-        #config-status { position: fixed; top: 20px; right: 20px; padding: 10px 20px; border-radius: 10px; font-weight: bold; background: rgba(255,255,255,0.05); font-size: 14px; }
-        .status-ok { color: var(--vpn); border: 1px solid var(--vpn); }
-        .status-error { color: var(--primary); border: 1px solid var(--primary); }
-        
-        .credentials-box { background: #000; border: 1px solid #333; padding: 15px; margin-top: 15px; border-radius: 10px; font-family: monospace; font-size: 1.1rem; display: none; text-align: left; width: 100%; box-sizing: border-box; }
-        .active .credentials-box { display: block; color: #00FF99; }
+        .credentials-box { background: #000; border: 1px solid #333; padding: 15px; margin-top: 15px; border-radius: 10px; font-family: monospace; font-size: 1.1rem; display: none; text-align: left; width: 100%; color: var(--vpn); }
+        .active .credentials-box { display: block; }
+
+        #config-msg { position: fixed; top: 110px; right: 40px; font-weight: bold; padding: 10px; border-radius: 5px; z-index: 100; }
         .controls-hint { position: fixed; bottom: 30px; right: 50px; background: rgba(0,0,0,0.8); padding: 15px 35px; border-radius: 50px; border: 1px solid var(--primary); }
-        
-        h2 { margin: 10px 0; font-size: 1.5rem; }
+        input[type="file"] { display: none; }
     </style>
 </head>
 <body>
-    <div id="config-status">Cargando configuración...</div>
-    <header><h1>CineStream PS4</h1></header>
+    <header>
+        <a href="https://github.com/leocachondeo" class="nav-btn" id="btn-github">📁 MI GITHUB</a>
+        <h1>CineStream PS4</h1>
+        <label class="nav-btn sync" id="btn-sync">
+            🔄 SINCRONIZAR USB
+            <input type="file" id="file-input" accept=".json">
+        </label>
+    </header>
+
+    <div id="config-msg"></div>
     
-    <div class="section-header" style="color:var(--vpn); border-left-color:var(--vpn)">Seguridad y VPN (Configuración)</div>
+    <div class="section-header" style="color:var(--vpn); border-left-color:var(--vpn)">Seguridad y VPN (Privado)</div>
     <div class="container" id="vpn-container"></div>
 
     <div class="section-header" style="color:var(--iptv); border-left-color:var(--iptv)">IPTV Premium</div>
     <div class="container" id="iptv-container"></div>
 
-    <div class="section-header" style="color:var(--debrid); border-left-color:var(--debrid)">Debrid Cinema (España/Francia)</div>
+    <div class="section-header">Cine y TV (Debrid)</div>
     <div class="container" id="debrid-container"></div>
 
-    <div class="section-header" style="color:var(--mobile); border-left-color:var(--mobile)">Móvil (Web Video Caster)</div>
-    <div class="container" id="mobile-container"></div>
-
-    <div class="section-header">Webs de Cine Ligeras</div>
+    <div class="section-header">Webs Ligeras</div>
     <div class="container" id="web-container"></div>
 
-    <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>X</b>: Entrar | <b>Triángulo</b>: Recargar</div>
+    <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>X</b>: Entrar | <b>Triángulo</b>: Borrar Datos</div>
 
     <script>
-        let userConfig = {
-            alldebrid_api: "",
-            ipvanish_user: "Cargando...",
-            ipvanish_pass: "Cargando...",
-            xtream_url: "",
-            xtream_user: "",
-            xtream_pass: ""
+        let userConfig = JSON.parse(localStorage.getItem('cs_data')) || {
+            alldebrid_api: "", ipvanish_user: "Sin datos", ipvanish_pass: "Sin datos",
+            xtream_url: "", xtream_user: "", xtream_pass: ""
         };
 
         const sections = {
-            vpn: [
-                { name: 'SOCKS5 Proxy Info', url: 'https://account.ipvanish.com/index.php?t=SOCKS5%20Proxy', icon: 'https://cdn-icons-png.flaticon.com/512/1006/1006526.png', isVpn: true }
-            ],
-            iptv: [
-                { name: 'Xtream Player Web', url: 'http://webtv.iptvsmarters.com/', icon: 'https://cdn-icons-png.flaticon.com/512/3075/3075908.png', isIptv: true }
-            ],
+            vpn: [{ name: 'SOCKS5 Proxy Info', url: 'https://account.ipvanish.com/index.php?t=SOCKS5%20Proxy', icon: 'https://cdn-icons-png.flaticon.com/512/1006/1006526.png', isVpn: true }],
+            iptv: [{ name: 'Xtream Player Web', url: 'http://webtv.iptvsmarters.com/', icon: 'https://cdn-icons-png.flaticon.com/512/3075/3075908.png', isIptv: true }],
             debrid: [
                 { name: 'Debrid Media Manager', url: 'https://debridmediamanager.com/', icon: 'https://cdn-icons-png.flaticon.com/512/814/814587.png' },
                 { name: 'AllDebrid Manager', url: 'https://alldebrid.com/magnets/', icon: 'https://cdn-icons-png.flaticon.com/512/777/777242.png' }
             ],
-            mobile: [
-                { name: 'RECIBIR DESDE MÓVIL', url: 'http://webvideocaster.com/connect', icon: 'https://cdn-icons-png.flaticon.com/512/2589/2589174.png' }
-            ],
             web: [
+                { name: 'Photocall TV', url: 'https://photocall.tv', icon: 'https://cdn-icons-png.flaticon.com/512/716/716429.png' },
                 { name: 'HDFull .me', url: 'https://hdfull.me', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
-                { name: 'Votark (FR)', url: 'https://votark.com', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' },
-                { name: 'Photocall TV', url: 'https://photocall.tv', icon: 'https://cdn-icons-png.flaticon.com/512/716/716429.png' }
+                { name: 'Votark (FR)', url: 'https://votark.com', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
             ]
         };
 
         let currentSection = 'vpn', currentIndex = 0;
-        const sectionOrder = ['vpn', 'iptv', 'debrid', 'mobile', 'web'];
+        const sectionOrder = ['github', 'sync', 'vpn', 'iptv', 'debrid', 'web'];
 
-        function updateUrls() {
-            if (userConfig.xtream_url) {
-                const cleanUrl = userConfig.xtream_url.replace(/\/$/, "");
-                sections.iptv[0].url = `${cleanUrl}/webtv/?username=${userConfig.xtream_user}&password=${userConfig.xtream_pass}`;
+        function updateState() {
+            const msg = document.getElementById('config-msg');
+            if (userConfig.alldebrid_api) {
+                msg.innerHTML = "MEMORIA: ACTIVADA ✅";
+                msg.style.color = "#00FF99";
+                if (userConfig.xtream_url) {
+                    sections.iptv[0].url = `${userConfig.xtream_url.replace(/\/$/, "")}/webtv/?username=${userConfig.xtream_user}&password=${userConfig.xtream_pass}`;
+                }
+            } else {
+                msg.innerHTML = "MEMORIA: VACÍA ⚠️";
+                msg.style.color = "#E50914";
             }
+            renderAll();
         }
 
         function renderAll() {
-            sectionOrder.forEach(secId => {
+            // Actualizar botones de arriba
+            document.getElementById('btn-github').className = (currentSection === 'github' ? 'nav-btn active' : 'nav-btn');
+            document.getElementById('btn-sync').className = (currentSection === 'sync' ? 'nav-btn sync active' : 'nav-btn sync');
+
+            // Renderizar secciones
+            ['vpn', 'iptv', 'debrid', 'web'].forEach(secId => {
                 const container = document.getElementById(secId + '-container');
-                if (!container) return;
                 container.innerHTML = '';
                 sections[secId].forEach((site, index) => {
                     const card = document.createElement('div');
                     const isActive = (currentSection === secId && index === currentIndex);
-                    card.className = 'site-card ' + secId + '-card' + (isActive ? ' active' : '');
-                    
+                    card.className = 'site-card' + (isActive ? ' active' : '');
                     let content = `<img src="${site.icon}"><h2>${site.name}</h2>`;
-                    
                     if (site.isVpn) {
-                        content += `<div class="credentials-box">
-                            <b>SOCKS5 PROXY:</b><br>
-                            USER: ${userConfig.ipvanish_user}<br>
-                            PASS: ${userConfig.ipvanish_pass}<br>
-                            PORT: 1080
-                        </div>`;
+                        content += `<div class="credentials-box"><b>VPN PRIVADA:</b><br>USER: ${userConfig.ipvanish_user}<br>PASS: ${userConfig.ipvanish_pass}<br>PUERTO: 1080</div>`;
                     }
-                    
                     card.innerHTML = content;
                     card.onclick = () => { window.location.href = site.url; };
                     container.appendChild(card);
                 });
             });
-            const activeCard = document.querySelector('.active');
-            if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const active = document.querySelector('.active');
+            if (active) active.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        async function loadConfig() {
-            const statusEl = document.getElementById('config-status');
-            try {
-                // Buscamos el archivo en el mismo directorio (GitHub)
-                const response = await fetch('config.json?t=' + Date.now());
-                if (response.ok) {
-                    userConfig = await response.json();
-                    statusEl.innerText = "CUENTAS VINCULADAS ✅";
-                    statusEl.className = "status-ok";
-                    updateUrls();
-                    renderAll();
-                } else {
-                    throw new Error();
-                }
-            } catch (e) {
-                statusEl.innerText = "ERROR AL CARGAR CONFIG.JSON ❌";
-                statusEl.className = "status-error";
-                renderAll();
-            }
-        }
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                userConfig = JSON.parse(e.target.result);
+                localStorage.setItem('cs_data', JSON.stringify(userConfig));
+                alert("¡Configuración guardada en la PS4!");
+                updateState();
+            };
+            reader.readAsText(e.target.files[0]);
+        });
 
         document.addEventListener('keydown', (e) => {
             const keyCode = e.keyCode || e.which;
-            const currentList = sections[currentSection];
-            
-            if (keyCode === 38222) location.reload(); // Triángulo recarga la página
+            const currentList = sections[currentSection] || [1]; // Fallback para botones header
 
-            if (keyCode === 39) currentIndex = (currentIndex + 1) % currentList.length;
-            else if (keyCode === 37) currentIndex = (currentIndex - 1 + currentList.length) % currentList.length;
-            else if (keyCode === 40) {
+            if (keyCode === 38222) { // Triángulo: Borrar
+                if(confirm("¿Borrar contraseñas de la memoria de la PS4?")) {
+                    localStorage.removeItem('cs_data');
+                    location.reload();
+                }
+            }
+
+            if (keyCode === 39) { // Derecha
+                if (currentSection === 'github') currentSection = 'sync';
+                else if (currentSection === 'sync') { currentSection = 'vpn'; currentIndex = 0; }
+                else currentIndex = (currentIndex + 1) % currentList.length;
+            } 
+            else if (keyCode === 37) { // Izquierda
+                if (currentIndex > 0) currentIndex--;
+                else if (currentSection === 'sync') currentSection = 'github';
+                else if (currentSection !== 'github') { currentSection = 'sync'; }
+            }
+            else if (keyCode === 40) { // Abajo
                 let idx = sectionOrder.indexOf(currentSection);
                 if (idx < sectionOrder.length - 1) { currentSection = sectionOrder[idx + 1]; currentIndex = 0; }
-            } else if (keyCode === 38) {
+            }
+            else if (keyCode === 38) { // Arriba
                 let idx = sectionOrder.indexOf(currentSection);
                 if (idx > 0) { currentSection = sectionOrder[idx - 1]; currentIndex = 0; }
-            } else if (keyCode === 13 || keyCode === 32 || keyCode === 0) {
-                window.location.href = currentList[currentIndex].url;
+            }
+            else if (keyCode === 13) { // X
+                if (currentSection === 'github') window.location.href = "https://github.com/leocachondeo";
+                else if (currentSection === 'sync') document.getElementById('file-input').click();
+                else window.location.href = currentList[currentIndex].url;
             }
             renderAll();
         });
 
-        renderAll();
-        loadConfig();
+        updateState();
     </script>
 </body>
 </html>
