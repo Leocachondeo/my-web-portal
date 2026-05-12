@@ -11,9 +11,10 @@
         h1 { margin: 0; font-size: 3.5rem; text-transform: uppercase; letter-spacing: 8px; color: var(--primary); }
         .section-header { color: var(--section-title); font-size: 2rem; margin: 50px 0 25px 0; border-left: 6px solid var(--primary); padding-left: 20px; }
         .container { display: flex; gap: 25px; flex-wrap: wrap; }
-        .site-card { background: var(--card-bg); width: 260px; padding: 20px; border-radius: 15px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.15s; }
-        .site-card.active { border-color: var(--primary); transform: scale(1.1); background: #252525; box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); }
-        .site-card img { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px; background: #333; }
+        .site-card { background: var(--card-bg); width: 260px; padding: 20px; border-radius: 15px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.1s; cursor: pointer; }
+        .site-card.active { border-color: var(--primary); transform: scale(1.1); background: #252525; box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); z-index: 10; }
+        .site-card.pressed { transform: scale(0.95); background: var(--primary); }
+        .site-card img { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px; background: #333; pointer-events: none; }
         .controls-hint { position: fixed; bottom: 30px; right: 50px; background: rgba(0,0,0,0.8); padding: 15px 35px; border-radius: 50px; border: 1px solid var(--primary); }
     </style>
 </head>
@@ -32,7 +33,7 @@
     <div class="section-header">Reproductores Directos</div>
     <div class="container" id="player-container"></div>
 
-    <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>X / Enter</b>: Entrar</div>
+    <div class="controls-hint" id="debug-info"><b>Cruceta</b>: Navegar | <b>Botón X</b>: Entrar</div>
 
     <script>
         const sections = {
@@ -51,7 +52,7 @@
                 { name: 'Votark', url: 'https://votark.com', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
             ],
             player: [
-                { name: 'YouTube', url: 'https://youtube.com/tv', icon: 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png' },
+                { name: 'YouTube TV', url: 'https://youtube.com/tv', icon: 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png' },
                 { name: 'Twitch', url: 'https://twitch.tv', icon: 'https://cdn-icons-png.flaticon.com/512/5968/5968819.png' }
             ]
         };
@@ -67,6 +68,8 @@
                     const card = document.createElement('div');
                     card.className = 'site-card' + (currentSection === secId && index === currentIndex ? ' active' : '');
                     card.innerHTML = `<img src="${site.icon}"><h2>${site.name}</h2>`;
+                    // Añadimos también soporte para clic del ratón/puntero
+                    card.onclick = () => { window.location.href = site.url; };
                     container.appendChild(card);
                 });
             });
@@ -74,12 +77,22 @@
             if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        // Mapeo de teclas PS4 y PC
+        function triggerAction() {
+            const currentList = sections[currentSection];
+            const activeCard = document.querySelector('.active');
+            if (activeCard) {
+                activeCard.classList.add('pressed');
+                setTimeout(() => {
+                    window.location.href = currentList[currentIndex].url;
+                }, 200);
+            }
+        }
+
         document.addEventListener('keydown', (e) => {
             const currentList = sections[currentSection];
             const keyCode = e.keyCode || e.which;
 
-            // Navegación (Cruceta o Flechas)
+            // Navegación
             if (keyCode === 39) currentIndex = (currentIndex + 1) % currentList.length; // Derecha
             else if (keyCode === 37) currentIndex = (currentIndex - 1 + currentList.length) % currentList.length; // Izquierda
             else if (keyCode === 40) { // Abajo
@@ -89,9 +102,10 @@
                 let idx = sectionOrder.indexOf(currentSection);
                 if (idx > 0) { currentSection = sectionOrder[idx - 1]; currentIndex = 0; }
             } 
-            // Botón X de PS4 (Suele ser 13 o 0 dependiendo del modo del navegador)
-            else if (keyCode === 13 || keyCode === 0) { 
-                window.location.href = currentList[currentIndex].url;
+            // Botón X de PS4: Cubrimos todos los códigos posibles (13=Enter, 32=Espacio, 0=Tecla de sistema)
+            else if (keyCode === 13 || keyCode === 32 || keyCode === 0) { 
+                e.preventDefault();
+                triggerAction();
             }
             
             renderAll();
