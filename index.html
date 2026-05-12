@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
-    <title>CineStream PS4 LIGHT (USB Auto-Config)</title>
+    <title>CineStream PS4 LIGHT (USB DEBUG)</title>
     <style>
         :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A; --text: #F5F5F5; --mobile: #27AE60; --debrid: #00CCFF; --vpn: #00FF99; --iptv: #FFA500; }
         body { background-color: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 40px; overflow-y: auto; }
@@ -14,22 +15,23 @@
         .site-card { background: var(--card-bg); width: 320px; padding: 30px; border-radius: 15px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.1s; cursor: pointer; }
         .site-card.active { border-color: var(--primary); transform: scale(1.05); background: #222; box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); z-index: 10; }
         .site-card.vpn-card.active { border-color: var(--vpn); box-shadow: 0 15px 30px rgba(0, 255, 153, 0.5); }
-        .site-card.iptv-card.active { border-color: var(--iptv); box-shadow: 0 15px 30px rgba(255, 165, 0, 0.5); }
-        .site-card img { width: 120px; height: 120px; border-radius: 50%; margin-bottom: 15px; background: #333; }
         
-        #usb-status { position: fixed; top: 20px; right: 20px; padding: 10px 20px; border-radius: 10px; font-weight: bold; background: #333; }
-        .status-ok { color: var(--vpn); border: 2px solid var(--vpn); }
-        .status-error { color: var(--primary); border: 2px solid var(--primary); }
+        #usb-status { position: fixed; top: 20px; right: 20px; padding: 10px 20px; border-radius: 10px; font-weight: bold; background: #333; z-index: 1000; }
+        .status-ok { color: var(--vpn); border: 2px solid var(--vpn); background: rgba(0,255,153,0.1) !important; }
+        .status-error { color: var(--primary); border: 2px solid var(--primary); background: rgba(229,9,20,0.1) !important; }
+        
+        #debug-console { background: #000; color: #00FF00; padding: 15px; border-radius: 10px; margin-top: 20px; font-family: monospace; font-size: 14px; border: 1px solid #333; height: 150px; overflow-y: scroll; display: none; }
         
         .credentials-box { background: #222; border: 1px solid #444; padding: 15px; margin-top: 10px; border-radius: 10px; font-family: monospace; font-size: 1.2rem; display: none; }
         .active .credentials-box { display: block; color: #00FF99; }
-        
         .controls-hint { position: fixed; bottom: 30px; right: 50px; background: rgba(0,0,0,0.8); padding: 15px 35px; border-radius: 50px; border: 1px solid var(--primary); }
     </style>
 </head>
 <body>
-    <div id="usb-status">Buscando USB (config.json)...</div>
+    <div id="usb-status">Iniciando sistema...</div>
     <header><h1>CineStream PS4 LIGHT</h1></header>
+
+    <div id="debug-console"></div>
     
     <div class="section-header" style="color:var(--vpn); border-left-color:var(--vpn)">Seguridad y VPN (Francia)</div>
     <div class="container" id="vpn-container"></div>
@@ -46,13 +48,20 @@
     <div class="section-header">Webs de Cine</div>
     <div class="container" id="web-container"></div>
 
-    <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>X</b>: Entrar</div>
+    <div class="controls-hint"><b>Triángulo</b>: Mostrar Consola | <b>Cruceta</b>: Navegar | <b>X</b>: Entrar</div>
 
     <script>
+        const log = (msg) => {
+            const console = document.getElementById('debug-console');
+            console.innerHTML += `> ${msg}<br>`;
+            console.scrollTop = console.scrollHeight;
+            console.style.display = 'block';
+        };
+
         let userConfig = {
             alldebrid_api: "",
-            ipvanish_user: "No cargado",
-            ipvanish_pass: "No cargado",
+            ipvanish_user: "Pendiente USB",
+            ipvanish_pass: "Pendiente USB",
             xtream_url: "",
             xtream_user: "",
             xtream_pass: ""
@@ -83,9 +92,9 @@
         const sectionOrder = ['vpn', 'iptv', 'debrid', 'mobile', 'web'];
 
         function updateUrls() {
-            // Inyectar datos de IPTV si existen
             if (userConfig.xtream_url) {
                 sections.iptv[0].url = `${userConfig.xtream_url}/webtv/?username=${userConfig.xtream_user}&password=${userConfig.xtream_pass}`;
+                log("URLs de IPTV actualizadas.");
             }
         }
 
@@ -100,7 +109,6 @@
                     card.className = 'site-card ' + secId + '-card' + (isActive ? ' active' : '');
                     
                     let content = `<img src="${site.icon}"><h2>${site.name}</h2>`;
-                    
                     if (site.isVpn) {
                         content += `<div class="credentials-box">
                             USER: ${userConfig.ipvanish_user}<br>
@@ -108,7 +116,6 @@
                             PORT: 1080
                         </div>`;
                     }
-                    
                     card.innerHTML = content;
                     card.onclick = () => { window.location.href = site.url; };
                     container.appendChild(card);
@@ -119,29 +126,47 @@
         }
 
         async function tryLoadUSB() {
-            const paths = ['/mnt/usb0/config.json', '/mnt/usb1/config.json', '/hostapp/config.json'];
+            log("Iniciando escaneo de USB...");
+            // Rutas extendidas para PS4 (intentamos acceso local y vía host)
+            const paths = [
+                '/mnt/usb0/config.json', 
+                '/mnt/usb1/config.json', 
+                'file:///mnt/usb0/config.json',
+                'file:///mnt/usb1/config.json',
+                'config.json' // Mismo directorio que el HTML
+            ];
             const statusEl = document.getElementById('usb-status');
             
             for (let path of paths) {
+                log("Probando: " + path);
                 try {
                     const response = await fetch(path);
                     if (response.ok) {
                         userConfig = await response.json();
-                        statusEl.innerText = "USB DETECTADO: CUENTAS CARGADAS ✅";
+                        log("¡ÉXITO! Datos cargados desde: " + path);
+                        statusEl.innerText = "USB DETECTADO ✅";
                         statusEl.className = "status-ok";
                         updateUrls();
                         renderAll();
                         return;
                     }
-                } catch (e) { console.log("No en: " + path); }
+                } catch (e) { log("Error/No existe: " + path); }
             }
-            statusEl.innerText = "USB NO DETECTADO (Usando manual) ❌";
+            statusEl.innerText = "USB NO DETECTADO ❌";
             statusEl.className = "status-error";
+            log("Fin del escaneo. Asegúrate de que el USB sea FAT32/exFAT.");
         }
 
         document.addEventListener('keydown', (e) => {
-            const currentList = sections[currentSection];
             const keyCode = e.keyCode || e.which;
+            log("Tecla pulsada: " + keyCode);
+            
+            if (keyCode === 38222) { // Triángulo en algunos navegadores de PS4
+                const console = document.getElementById('debug-console');
+                console.style.display = console.style.display === 'none' ? 'block' : 'none';
+            }
+
+            const currentList = sections[currentSection];
             if (keyCode === 39) currentIndex = (currentIndex + 1) % currentList.length;
             else if (keyCode === 37) currentIndex = (currentIndex - 1 + currentList.length) % currentList.length;
             else if (keyCode === 40) {
@@ -157,7 +182,8 @@
         });
 
         renderAll();
-        tryLoadUSB();
+        // Retraso de 2 segundos para dar tiempo al sistema de montar el USB
+        setTimeout(tryLoadUSB, 2000);
     </script>
 </body>
 </html>
