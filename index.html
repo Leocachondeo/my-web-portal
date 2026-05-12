@@ -1,13 +1,11 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
-    <title>CineStream PS4 - IPTV & DEBRID</title>
+    <title>CineStream PS4 - ULTIMATE</title>
     <style>
-        :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A; --text: #F5F5F5; --stremio: #8E44AD; --debrid: #00CCFF; --iptv: #2ECC71; }
+        :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A; --text: #F5F5F5; --stremio: #8E44AD; --debrid: #00CCFF; --iptv: #2ECC71; --vpn: #00FF99; }
         body { background-color: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 40px; overflow-x: hidden; }
         header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 40px; text-align: center; }
         h1 { margin: 0; font-size: 3.5rem; text-transform: uppercase; letter-spacing: 8px; color: var(--primary); }
@@ -17,7 +15,7 @@
         .site-card.active { border-color: var(--primary); transform: scale(1.1); background: #222; box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); z-index: 10; }
         .site-card.stremio-card.active { border-color: var(--stremio); box-shadow: 0 15px 30px rgba(142, 68, 173, 0.5); }
         .site-card.debrid-card.active { border-color: var(--debrid); box-shadow: 0 15px 30px rgba(0, 204, 255, 0.5); }
-        .site-card.iptv-card.active { border-color: var(--iptv); box-shadow: 0 15px 30px rgba(46, 204, 113, 0.5); }
+        .site-card.vpn-card.active { border-color: var(--vpn); box-shadow: 0 15px 30px rgba(0, 255, 153, 0.5); }
         .site-card.pressed { background: var(--primary); transform: scale(0.95); }
         .site-card img { width: 110px; height: 110px; border-radius: 50%; margin-bottom: 15px; background: #333; pointer-events: none; }
         .controls-hint { position: fixed; bottom: 30px; right: 50px; background: rgba(0,0,0,0.8); padding: 15px 35px; border-radius: 50px; border: 1px solid var(--primary); }
@@ -26,7 +24,10 @@
 <body>
     <header><h1>CineStream PS4</h1></header>
     
-    <div class="section-header" style="color:var(--stremio); border-left-color:var(--stremio)">Kodi / Stremio (HTTPS Seguro)</div>
+    <div class="section-header" style="color:var(--vpn); border-left-color:var(--vpn)">Seguridad y VPN (Francia)</div>
+    <div class="container" id="vpn-container"></div>
+
+    <div class="section-header" style="color:var(--stremio); border-left-color:var(--stremio)">Kodi / Stremio (Recomendado)</div>
     <div class="container" id="stremio-container"></div>
 
     <div class="section-header" style="color:var(--iptv); border-left-color:var(--iptv)">IPTV & Xtream Codes</div>
@@ -35,16 +36,17 @@
     <div class="section-header" style="color:var(--debrid); border-left-color:var(--debrid)">AllDebrid Premium</div>
     <div class="container" id="debrid-container"></div>
 
-    <div class="section-header">TV en Vivo (ES / FR)</div>
-    <div class="container" id="tv-container"></div>
-
-    <div class="section-header">Webs de Cine (Scrapers)</div>
+    <div class="section-header">TV en Vivo / Cine Web</div>
     <div class="container" id="web-container"></div>
 
     <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>Botón X</b>: Entrar</div>
 
     <script>
         const sections = {
+            vpn: [
+                { name: 'IPVanish Panel', url: 'https://account.ipvanish.com/', icon: 'https://cdn-icons-png.flaticon.com/512/2092/2092202.png' },
+                { name: 'SOCKS5 Proxy Info', url: 'https://account.ipvanish.com/index.php?t=SOCKS5%20Proxy', icon: 'https://cdn-icons-png.flaticon.com/512/1006/1006526.png' }
+            ],
             stremio: [
                 { name: 'STREMIO WEB', url: 'https://web.stremio.com/', icon: 'https://www.stremio.com/website/stremio-logo-small.png' }
             ],
@@ -55,19 +57,15 @@
             debrid: [
                 { name: 'AllDebrid Magnets', url: 'https://alldebrid.com/magnets/', icon: 'https://cdn-icons-png.flaticon.com/512/814/814587.png' }
             ],
-            tv: [
-                { name: 'Photocall TV', url: 'https://photocall.tv', icon: 'https://cdn-icons-png.flaticon.com/512/716/716429.png' },
-                { name: 'France.tv Direct', url: 'https://www.france.tv/direct/', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
-            ],
             web: [
+                { name: 'Photocall TV', url: 'https://photocall.tv', icon: 'https://cdn-icons-png.flaticon.com/512/716/716429.png' },
                 { name: 'HDFull', url: 'https://hdfull.me', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
-                { name: 'Votark (FR)', url: 'https://votark.com', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' },
                 { name: 'Wawacity (FR)', url: 'https://wawacity.red', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' }
             ]
         };
 
-        let currentSection = 'stremio', currentIndex = 0;
-        const sectionOrder = ['stremio', 'iptv', 'debrid', 'tv', 'web'];
+        let currentSection = 'vpn', currentIndex = 0;
+        const sectionOrder = ['vpn', 'stremio', 'iptv', 'debrid', 'web'];
 
         function renderAll() {
             sectionOrder.forEach(secId => {
