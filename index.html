@@ -1,111 +1,78 @@
 <!DOCTYPE html>
-    2 <html lang="es">
-    3 <head>
-    4     <meta charset="UTF-8">
-    5     <meta name="viewport" content="width=1920, height=1080,
-      initial-scale=1.0">
-    6     <title>CineStream PS4</title>
-    7     <style>
-    8         :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A;
-      --text: #F5F5F5; --section-title: #FFD700; }
-    9         body { background-color: var(--bg); color: var(--text);
-      font-family: sans-serif; margin: 0; padding: 40px; overflow-x: hidden; }
-   10         header { border-bottom: 3px solid var(--primary); padding-bottom:
-      15px; margin-bottom: 40px; text-align: center; }
-   11         h1 { margin: 0; font-size: 3.5rem; text-transform: uppercase;
-      letter-spacing: 8px; color: var(--primary); }
-   12         .section-header { color: var(--section-title); font-size: 2rem;
-      margin: 50px 0 25px 0; border-left: 6px solid var(--primary);
-      padding-left: 20px; }
-   13         .container { display: flex; gap: 25px; flex-wrap: wrap; }
-   14         .site-card { background: var(--card-bg); width: 260px; padding:
-      20px; border-radius: 15px; text-decoration: none; color: white; border:
-      3px solid transparent; text-align: center; display: flex; flex-direction:
-      column; align-items: center; transition: 0.2s; }
-   15         .site-card.active { border-color: var(--primary); transform:
-      scale(1.1); background: #252525; box-shadow: 0 15px 30px rgba(229, 9, 20,
-      0.4); }
-   16         .site-card img { width: 100px; height: 100px; border-radius: 50%;
-      margin-bottom: 15px; background: #333; }
-   17         .controls-hint { position: fixed; bottom: 30px; right: 50px;
-      background: rgba(0,0,0,0.8); padding: 15px 35px; border-radius: 50px;
-      border: 1px solid var(--primary); }
-   18     </style>
-   19 </head>
-   20 <body>
-   21     <header><h1>CineStream PS4</h1></header>
-   22     <div class="section-header">HDFull - Dominios Espejo</div>
-   23     <div class="container" id="hdfull-container"></div>
-   24     <div class="section-header">Películas y Series (Español)</div>
-   25     <div class="container" id="spanish-container"></div>
-   26     <div class="section-header">Cinéma Français</div>
-   27     <div class="container" id="french-container"></div>
-   28     <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>X</b>:
-      Entrar</div>
-   29     <script>
-   30         const sections = {
-   31             hdfull: [
-   32                 { name: 'HDFull .org', url: 'https://hdfull.org', icon:
-      'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
-   33                 { name: 'HDFull .io', url: 'https://hdfull.io', icon:
-      'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
-   34                 { name: 'HDFull .me', url: 'https://hdfull.me', icon:
-      'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' }
-   35             ],
-   36             spanish: [
-   37                 { name: 'Cuevana 3', url: 'https://cuevana.biz', icon:
-      'https://cdn-icons-png.flaticon.com/512/705/705062.png' },
-   38                 { name: 'PelisPlus', url: 'https://pelisplus.so', icon:
-      'https://cdn-icons-png.flaticon.com/512/4221/4221419.png' },
-   39                 { name: 'Gnula', url: 'https://gnula.nu', icon:
-      'https://cdn-icons-png.flaticon.com/512/2589/2589304.png' },
-   40                 { name: 'AnimeFLV', url: 'https://animeflv.net', icon:
-      'https://cdn-icons-png.flaticon.com/512/10433/10433048.png' }
-   41             ],
-   42             french: [
-   43                 { name: 'Votark', url: 'https://votark.com', icon:
-      'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
-   44             ]
-   45         };
-   46         let currentSection = 'hdfull', currentIndex = 0;
-   47         const sectionOrder = ['hdfull', 'spanish', 'french'];
-   48         function renderAll() {
-   49             sectionOrder.forEach(secId => {
-   50                 const container = document.getElementById(secId +
-      '-container');
-   51                 container.innerHTML = '';
-   52                 sections[secId].forEach((site, index) => {
-   53                     const card = document.createElement('div');
-   54                     card.className = 'site-card' + (currentSection ===
-      secId && index === currentIndex ? ' active' : '');
-   55                     card.innerHTML = `<img
-      src="${site.icon}"><h2>${site.name}</h2>`;
-   56                     container.appendChild(card);
-   57                 });
-   58             });
-   59             const activeCard = document.querySelector('.active');
-   60             if (activeCard) activeCard.scrollIntoView({ behavior:
-      'smooth', block: 'center' });
-   61         }
-   62         document.addEventListener('keydown', (e) => {
-   63             const currentList = sections[currentSection];
-   64             if (e.key === 'ArrowRight') currentIndex = (currentIndex + 1)
-      % currentList.length;
-   65             else if (e.key === 'ArrowLeft') currentIndex = (currentIndex -
-      1 + currentList.length) % currentList.length;
-   66             else if (e.key === 'ArrowDown') {
-   67                 let idx = sectionOrder.indexOf(currentSection);
-   68                 if (idx < sectionOrder.length - 1) { currentSection =
-      sectionOrder[idx + 1]; currentIndex = 0; }
-   69             } else if (e.key === 'ArrowUp') {
-   70                 let idx = sectionOrder.indexOf(currentSection);
-   71                 if (idx > 0) { currentSection = sectionOrder[idx - 1];
-      currentIndex = 0; }
-   72             } else if (e.key === 'Enter' || e.key === 'x' || e.key ===
-      'X') window.location.href = currentList[currentIndex].url;
-   73             renderAll();
-   74         });
-   75         renderAll();
-   76     </script>
-   77 </body>
-   78 </html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+    <title>CineStream PS4</title>
+    <style>
+        :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A; --text: #F5F5F5; --section-title: #FFD700; }
+        body { background-color: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 40px; overflow-x: hidden; }
+        header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 40px; text-align: center; }
+        h1 { margin: 0; font-size: 3.5rem; text-transform: uppercase; letter-spacing: 8px; color: var(--primary); }
+        .section-header { color: var(--section-title); font-size: 2rem; margin: 50px 0 25px 0; border-left: 6px solid var(--primary); padding-left: 20px; }
+        .container { display: flex; gap: 25px; flex-wrap: wrap; }
+        .site-card { background: var(--card-bg); width: 260px; padding: 20px; border-radius: 15px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
+        .site-card.active { border-color: var(--primary); transform: scale(1.1); background: #252525; box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); }
+        .site-card img { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px; background: #333; }
+        .controls-hint { position: fixed; bottom: 30px; right: 50px; background: rgba(0,0,0,0.8); padding: 15px 35px; border-radius: 50px; border: 1px solid var(--primary); }
+    </style>
+</head>
+<body>
+    <header><h1>CineStream PS4</h1></header>
+    <div class="section-header">HDFull - Dominios Espejo</div>
+    <div class="container" id="hdfull-container"></div>
+    <div class="section-header">Películas y Series (Español)</div>
+    <div class="container" id="spanish-container"></div>
+    <div class="section-header">Cinéma Français</div>
+    <div class="container" id="french-container"></div>
+    <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>X</b>: Entrar</div>
+    <script>
+        const sections = {
+            hdfull: [
+                { name: 'HDFull .org', url: 'https://hdfull.org', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
+                { name: 'HDFull .io', url: 'https://hdfull.io', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
+                { name: 'HDFull .me', url: 'https://hdfull.me', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' }
+            ],
+            spanish: [
+                { name: 'Cuevana 3', url: 'https://cuevana.biz', icon: 'https://cdn-icons-png.flaticon.com/512/705/705062.png' },
+                { name: 'PelisPlus', url: 'https://pelisplus.so', icon: 'https://cdn-icons-png.flaticon.com/512/4221/4221419.png' },
+                { name: 'Gnula', url: 'https://gnula.nu', icon: 'https://cdn-icons-png.flaticon.com/512/2589/2589304.png' },
+                { name: 'AnimeFLV', url: 'https://animeflv.net', icon: 'https://cdn-icons-png.flaticon.com/512/10433/10433048.png' }
+            ],
+            french: [
+                { name: 'Votark', url: 'https://votark.com', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
+            ]
+        };
+        let currentSection = 'hdfull', currentIndex = 0;
+        const sectionOrder = ['hdfull', 'spanish', 'french'];
+        function renderAll() {
+            sectionOrder.forEach(secId => {
+                const container = document.getElementById(secId + '-container');
+                container.innerHTML = '';
+                sections[secId].forEach((site, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'site-card' + (currentSection === secId && index === currentIndex ? ' active' : '');
+                    card.innerHTML = `<img src="${site.icon}"><h2>${site.name}</h2>`;
+                    container.appendChild(card);
+                });
+            });
+            const activeCard = document.querySelector('.active');
+            if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        document.addEventListener('keydown', (e) => {
+            const currentList = sections[currentSection];
+            if (e.key === 'ArrowRight') currentIndex = (currentIndex + 1) % currentList.length;
+            else if (e.key === 'ArrowLeft') currentIndex = (currentIndex - 1 + currentList.length) % currentList.length;
+            else if (e.key === 'ArrowDown') {
+                let idx = sectionOrder.indexOf(currentSection);
+                if (idx < sectionOrder.length - 1) { currentSection = sectionOrder[idx + 1]; currentIndex = 0; }
+            } else if (e.key === 'ArrowUp') {
+                let idx = sectionOrder.indexOf(currentSection);
+                if (idx > 0) { currentSection = sectionOrder[idx - 1]; currentIndex = 0; }
+            } else if (e.key === 'Enter' || e.key === 'x' || e.key === 'X') window.location.href = currentList[currentIndex].url;
+            renderAll();
+        });
+        renderAll();
+    </script>
+</body>
+</html>
