@@ -5,14 +5,16 @@
     <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
     <title>CineStream PS4</title>
     <style>
-        :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A; --text: #F5F5F5; --section-title: #FFD700; }
+        :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A; --text: #F5F5F5; --section-title: #FFD700; --debrid: #00CCFF; }
         body { background-color: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 40px; overflow-x: hidden; }
         header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 40px; text-align: center; }
         h1 { margin: 0; font-size: 3.5rem; text-transform: uppercase; letter-spacing: 8px; color: var(--primary); }
-        .section-header { color: var(--section-title); font-size: 2rem; margin: 50px 0 25px 0; border-left: 6px solid var(--primary); padding-left: 20px; }
+        .section-header { color: var(--section-title); font-size: 2rem; margin: 50px 0 25px 0; border-left: 6px solid var(--primary); padding-left: 20px; text-transform: uppercase; }
+        .section-header.debrid-sec { color: var(--debrid); border-left-color: var(--debrid); }
         .container { display: flex; gap: 25px; flex-wrap: wrap; }
         .site-card { background: var(--card-bg); width: 260px; padding: 20px; border-radius: 15px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.1s; cursor: pointer; }
         .site-card.active { border-color: var(--primary); transform: scale(1.1); background: #252525; box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); z-index: 10; }
+        .site-card.debrid-card.active { border-color: var(--debrid); box-shadow: 0 15px 30px rgba(0, 204, 255, 0.4); }
         .site-card.pressed { transform: scale(0.95); background: var(--primary); }
         .site-card img { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px; background: #333; pointer-events: none; }
         .controls-hint { position: fixed; bottom: 30px; right: 50px; background: rgba(0,0,0,0.8); padding: 15px 35px; border-radius: 50px; border: 1px solid var(--primary); }
@@ -21,44 +23,52 @@
 <body>
     <header><h1>CineStream PS4</h1></header>
     
-    <div class="section-header">HDFull - Dominios Espejo</div>
-    <div class="container" id="hdfull-container"></div>
-    
-    <div class="section-header">Películas y Series (Español)</div>
+    <div class="section-header debrid-sec">Premium & Debrid</div>
+    <div class="container" id="debrid-container"></div>
+
+    <div class="section-header">TV en Vivo (España)</div>
+    <div class="container" id="tves-container"></div>
+
+    <div class="section-header">TV en Direct (France)</div>
+    <div class="container" id="tvfr-container"></div>
+
+    <div class="section-header">HDFull & Cine (Español)</div>
     <div class="container" id="spanish-container"></div>
 
     <div class="section-header">Cinéma Français</div>
     <div class="container" id="french-container"></div>
 
-    <div class="section-header">Reproductores Directos</div>
-    <div class="container" id="player-container"></div>
-
-    <div class="controls-hint" id="debug-info"><b>Cruceta</b>: Navegar | <b>Botón X</b>: Entrar</div>
+    <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>X</b>: Entrar</div>
 
     <script>
         const sections = {
-            hdfull: [
-                { name: 'HDFull .org', url: 'https://hdfull.org', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
-                { name: 'HDFull .io', url: 'https://hdfull.io', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
-                { name: 'HDFull .me', url: 'https://hdfull.me', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' }
+            debrid: [
+                { name: 'AllDebrid Manager', url: 'https://alldebrid.com/magnets/', icon: 'https://cdn-icons-png.flaticon.com/512/814/814587.png' },
+                { name: 'Debrid Player', url: 'https://alldebrid.com/magnets/', icon: 'https://cdn-icons-png.flaticon.com/512/777/777242.png' }
+            ],
+            tves: [
+                { name: 'Photocall TV', url: 'https://photocall.tv', icon: 'https://cdn-icons-png.flaticon.com/512/716/716429.png' },
+                { name: 'Tivify (Gratis)', url: 'https://www.tivify.tv/es/', icon: 'https://cdn-icons-png.flaticon.com/512/3075/3075908.png' },
+                { name: 'Mitele', url: 'https://www.mitele.es/directo/', icon: 'https://cdn-icons-png.flaticon.com/512/10304/10304192.png' }
+            ],
+            tvfr: [
+                { name: 'France.tv', url: 'https://www.france.tv/direct/', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' },
+                { name: 'TF1+', url: 'https://www.tf1.fr/direct', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' },
+                { name: 'Molotov Web', url: 'https://www.molotov.tv/', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
             ],
             spanish: [
+                { name: 'HDFull .me', url: 'https://hdfull.me', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
                 { name: 'Cuevana 3', url: 'https://cuevana.biz', icon: 'https://cdn-icons-png.flaticon.com/512/705/705062.png' },
                 { name: 'PelisPlus', url: 'https://pelisplus.so', icon: 'https://cdn-icons-png.flaticon.com/512/4221/4221419.png' },
-                { name: 'Gnula', url: 'https://gnula.nu', icon: 'https://cdn-icons-png.flaticon.com/512/2589/2589304.png' },
                 { name: 'AnimeFLV', url: 'https://animeflv.net', icon: 'https://cdn-icons-png.flaticon.com/512/10433/10433048.png' }
             ],
             french: [
                 { name: 'Votark', url: 'https://votark.com', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
-            ],
-            player: [
-                { name: 'YouTube TV', url: 'https://youtube.com/tv', icon: 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png' },
-                { name: 'Twitch', url: 'https://twitch.tv', icon: 'https://cdn-icons-png.flaticon.com/512/5968/5968819.png' }
             ]
         };
 
-        let currentSection = 'hdfull', currentIndex = 0;
-        const sectionOrder = ['hdfull', 'spanish', 'french', 'player'];
+        let currentSection = 'debrid', currentIndex = 0;
+        const sectionOrder = ['debrid', 'tves', 'tvfr', 'spanish', 'french'];
 
         function renderAll() {
             sectionOrder.forEach(secId => {
@@ -66,9 +76,9 @@
                 container.innerHTML = '';
                 sections[secId].forEach((site, index) => {
                     const card = document.createElement('div');
-                    card.className = 'site-card' + (currentSection === secId && index === currentIndex ? ' active' : '');
+                    const isActive = (currentSection === secId && index === currentIndex);
+                    card.className = 'site-card' + (isActive ? ' active' : '') + (secId === 'debrid' ? ' debrid-card' : '');
                     card.innerHTML = `<img src="${site.icon}"><h2>${site.name}</h2>`;
-                    // Añadimos también soporte para clic del ratón/puntero
                     card.onclick = () => { window.location.href = site.url; };
                     container.appendChild(card);
                 });
@@ -82,35 +92,26 @@
             const activeCard = document.querySelector('.active');
             if (activeCard) {
                 activeCard.classList.add('pressed');
-                setTimeout(() => {
-                    window.location.href = currentList[currentIndex].url;
-                }, 200);
+                setTimeout(() => { window.location.href = currentList[currentIndex].url; }, 200);
             }
         }
 
         document.addEventListener('keydown', (e) => {
             const currentList = sections[currentSection];
             const keyCode = e.keyCode || e.which;
-
-            // Navegación
-            if (keyCode === 39) currentIndex = (currentIndex + 1) % currentList.length; // Derecha
-            else if (keyCode === 37) currentIndex = (currentIndex - 1 + currentList.length) % currentList.length; // Izquierda
-            else if (keyCode === 40) { // Abajo
+            if (keyCode === 39) currentIndex = (currentIndex + 1) % currentList.length;
+            else if (keyCode === 37) currentIndex = (currentIndex - 1 + currentList.length) % currentList.length;
+            else if (keyCode === 40) {
                 let idx = sectionOrder.indexOf(currentSection);
                 if (idx < sectionOrder.length - 1) { currentSection = sectionOrder[idx + 1]; currentIndex = 0; }
-            } else if (keyCode === 38) { // Arriba
+            } else if (keyCode === 38) {
                 let idx = sectionOrder.indexOf(currentSection);
                 if (idx > 0) { currentSection = sectionOrder[idx - 1]; currentIndex = 0; }
-            } 
-            // Botón X de PS4: Cubrimos todos los códigos posibles (13=Enter, 32=Espacio, 0=Tecla de sistema)
-            else if (keyCode === 13 || keyCode === 32 || keyCode === 0) { 
-                e.preventDefault();
-                triggerAction();
+            } else if (keyCode === 13 || keyCode === 32 || keyCode === 0) {
+                e.preventDefault(); triggerAction();
             }
-            
             renderAll();
         });
-
         renderAll();
     </script>
 </body>
