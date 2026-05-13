@@ -50,7 +50,6 @@
             color: var(--primary); 
             flex-grow: 1; 
             text-align: center; 
-            text-shadow: 2px 2px 8px rgba(229, 9, 20, 0.4);
         }
         
         .nav-btn { 
@@ -62,13 +61,8 @@
             border: 2px solid #444; 
             font-weight: bold; 
             font-size: 1rem; 
-            transition: 0.2s;
         }
-        .nav-btn.active { 
-            border-color: var(--primary); 
-            background: #333; 
-            box-shadow: 0 0 15px rgba(229, 9, 20, 0.6); 
-        }
+        .nav-btn.active { border-color: var(--primary); background: #333; box-shadow: 0 0 15px rgba(229, 9, 20, 0.6); }
 
         .section-header { 
             color: #FFD700; 
@@ -77,14 +71,8 @@
             border-left: 6px solid var(--primary); 
             padding-left: 15px; 
             text-transform: uppercase; 
-            letter-spacing: 1px;
         }
-        .container { 
-            display: flex; 
-            gap: 20px; 
-            flex-wrap: wrap; 
-            padding-bottom: 15px;
-        }
+        .container { display: flex; gap: 20px; flex-wrap: wrap; padding-bottom: 15px; }
         
         .site-card { 
             background: var(--card-bg); 
@@ -98,68 +86,82 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            transition: transform 0.1s, background 0.1s; 
-            cursor: pointer;
             box-sizing: border-box;
         }
-        .site-card img { 
-            width: 90px; 
-            height: 90px; 
-            margin-bottom: 15px; 
-            border-radius: 12px; 
-            background: #252525;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        .site-card h2 { 
-            font-size: 1.2rem; 
-            margin: 8px 0; 
-            font-weight: 600;
-        }
-        .site-card p {
-            font-size: 0.85rem;
-            color: #aaa;
-            margin: 0;
-            line-height: 1.2;
-        }
-        .site-card.active { 
-            border-color: var(--primary); 
-            transform: scale(1.06); 
-            background: #252525; 
-            box-shadow: 0 10px 25px rgba(229, 9, 20, 0.4); 
-            z-index: 10; 
-        }
+        .site-card img { width: 90px; height: 90px; margin-bottom: 15px; border-radius: 12px; background: #252525; padding: 8px; }
+        .site-card h2 { font-size: 1.2rem; margin: 8px 0; font-weight: 600; }
+        .site-card p { font-size: 0.85rem; color: #aaa; margin: 0; }
+        .site-card.active { border-color: var(--primary); transform: scale(1.06); background: #252525; box-shadow: 0 10px 25px rgba(229, 9, 20, 0.4); z-index: 10; }
         
-        .controls-hint { 
-            position: fixed; 
-            bottom: 25px; 
-            right: 40px; 
-            background: rgba(0,0,0,0.95); 
+        /* Panel de Configuración IPTV */
+        #iptv-config-panel {
+            background: #111;
+            border: 2px solid var(--iptv);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        #iptv-config-panel.show { display: block; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; color: var(--iptv); font-weight: bold; }
+        .input-group input { 
+            width: 100%; 
+            padding: 12px; 
+            background: #222; 
+            border: 1px solid #444; 
+            color: white; 
+            border-radius: 8px; 
+            font-size: 1.1rem;
+            box-sizing: border-box;
+        }
+        .save-btn { 
+            background: var(--iptv); 
+            color: black; 
+            border: none; 
             padding: 12px 30px; 
-            border-radius: 50px; 
-            border: 2px solid var(--primary); 
-            font-size: 1rem; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
-            z-index: 1000;
+            border-radius: 10px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 1.1rem;
+        }
+
+        .controls-hint { 
+            position: fixed; bottom: 25px; right: 40px; background: rgba(0,0,0,0.95); padding: 12px 30px; border-radius: 50px; border: 2px solid var(--primary); font-size: 1rem; z-index: 1000;
         }
         .controls-hint b { color: var(--primary); }
-
-        .fullscreen-tip {
-            color: #888;
-            font-size: 0.9rem;
-            margin: 20px 0;
-            text-align: center;
-            border-top: 1px solid #333;
-            padding-top: 20px;
-        }
     </style>
 </head>
 <body>
     <header>
-        <a href="https://github.com/leocachondeo" class="nav-btn" id="btn-github">📁 MI GITHUB</a>
+        <a href="#" class="nav-btn" id="btn-config" onclick="toggleConfig()">⚙️ CONFIGURAR MI IPTV</a>
         <h1>CineStream ULTIMATE</h1>
-        <div style="width: 150px;"></div> <!-- Espaciador -->
+        <a href="https://github.com/leocachondeo" class="nav-btn" id="btn-github">📁 MI GITHUB</a>
     </header>
+
+    <!-- Panel de configuración persistente -->
+    <div id="iptv-config-panel">
+        <h2 style="color:var(--iptv); margin-top:0;">Configuración Xtream Codes (Persistente)</h2>
+        <div class="input-group">
+            <label>URL del Servidor (ej: http://iptv.com:8080)</label>
+            <input type="text" id="iptv-url" placeholder="http://dominio.com:puerto">
+        </div>
+        <div class="input-group">
+            <label>Usuario</label>
+            <input type="text" id="iptv-user" placeholder="Tu usuario">
+        </div>
+        <div class="input-group">
+            <label>Contraseña</label>
+            <input type="password" id="iptv-pass" placeholder="Tu contraseña">
+        </div>
+        <button class="save-btn" onclick="saveIptv()">💾 GUARDAR Y ACTIVAR</button>
+        <p style="font-size:0.9rem; color:#888;">Los datos se guardan en tu PS4. No se envían a ningún servidor externo.</p>
+    </div>
+
+    <div class="section-header" style="color:var(--iptv); border-left-color:var(--iptv)">Mi IPTV Personal</div>
+    <div class="container" id="my-iptv-container">
+        <!-- Aquí aparecerá el botón dinámico -->
+    </div>
 
     <div class="section-header" style="color:var(--cast); border-left-color:var(--cast)">Chromecast / Enviar desde Móvil</div>
     <div class="container" id="cast-container"></div>
@@ -167,80 +169,93 @@
     <div class="section-header" style="color:var(--debrid); border-left-color:var(--debrid)">Debrid Cinema & Stremio</div>
     <div class="container" id="debrid-container"></div>
 
-    <div class="section-header" style="color:var(--iptv); border-left-color:var(--iptv)">IPTV & Xtream Codes</div>
+    <div class="section-header" style="color:var(--iptv); border-left-color:var(--iptv)">IPTV Web Players</div>
     <div class="container" id="iptv-container"></div>
 
     <div class="section-header" style="color:var(--sports); border-left-color:var(--sports)">Deportes en Directo</div>
     <div class="container" id="sports-container"></div>
 
-    <div class="section-header" style="color:var(--anime); border-left-color:var(--anime)">Anime & Animación</div>
-    <div class="container" id="anime-container"></div>
-
     <div class="section-header">Webs de Cine (Mirrors 2026)</div>
     <div class="container" id="web-container"></div>
 
-    <div class="section-header" style="color:var(--retro); border-left-color:var(--retro)">Retro Games (Web Emus)</div>
-    <div class="container" id="retro-container"></div>
-
-    <div class="section-header" style="color:var(--vpn); border-left-color:var(--vpn)">Seguridad y VPN</div>
-    <div class="container" id="vpn-container"></div>
-
-    <div class="fullscreen-tip">
-        <b>TIP PRO:</b> Usa el botón <b>Cuadrado</b> para Pantalla Completa. <b>R3</b> para Zoom.<br>
-        <i>Borra las Cookies del navegador si notas lentitud o errores de memoria.</i>
-    </div>
-    <div style="height: 100px;"></div>
-
-    <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>Botón X</b>: Entrar</div>
+    <div class="controls-hint"><b>Cruceta</b>: Navegar | <b>Botón X</b>: Entrar | <b>Triángulo</b>: Configurar</div>
 
     <script>
         const sections = {
+            'my-iptv': [], // Se llena dinámicamente
             cast: [
                 { name: 'Web Video Caster', desc: 'Receptor Principal', url: 'http://cast2tv.app', icon: 'https://cdn-icons-png.flaticon.com/512/2589/2589174.png' },
-                { name: 'CastBrowser', desc: 'Rápido y Simple', url: 'https://castb.cc', icon: 'https://cdn-icons-png.flaticon.com/512/3256/3256783.png' },
-                { name: 'AirDroid Cast', desc: 'Espejo de Pantalla', url: 'https://webcast.airdroid.com', icon: 'https://cdn-icons-png.flaticon.com/512/1006/1006526.png' }
+                { name: 'CastBrowser', desc: 'Rápido y Simple', url: 'https://castb.cc', icon: 'https://cdn-icons-png.flaticon.com/512/3256/3256783.png' }
             ],
             debrid: [
                 { name: 'Stremio Web', desc: 'Cine y Series (Debrid)', url: 'https://web.stremio.com/', icon: 'https://www.stremio.com/website/stremio-logo-small.png' },
-                { name: 'Debrid Media Manager', desc: 'Gestor de Contenido', url: 'https://debridmediamanager.com/', icon: 'https://cdn-icons-png.flaticon.com/512/814/814587.png' },
-                { name: 'AllDebrid Magnets', desc: 'Descarga Directa', url: 'https://alldebrid.com/magnets/', icon: 'https://cdn-icons-png.flaticon.com/512/777/777242.png' },
-                { name: 'Real-Debrid', desc: 'Panel Principal', url: 'https://real-debrid.com/', icon: 'https://cdn-icons-png.flaticon.com/512/1006/1006526.png' }
+                { name: 'Debrid Media Manager', desc: 'Gestor de Contenido', url: 'https://debridmediamanager.com/', icon: 'https://cdn-icons-png.flaticon.com/512/814/814587.png' }
             ],
             iptv: [
-                { name: 'OTTPlayer', desc: 'Recomendado (Estable)', url: 'https://ottplayer.tv/soft/browser', icon: 'https://cdn-icons-png.flaticon.com/512/3075/3075908.png' },
-                { name: 'Xtream Player Web', desc: 'Usa tus códigos Xtream', url: 'http://webtv.iptvsmarters.com/', icon: 'https://cdn-icons-png.flaticon.com/512/3075/3075908.png' },
-                { name: 'IPTV Player Stream', desc: 'Carga M3U Directo', url: 'https://iptvplayer.stream/', icon: 'https://cdn-icons-png.flaticon.com/512/716/716429.png' },
-                { name: 'IPTVnator Web', desc: 'Interfaz Moderna', url: 'https://iptvnator.vercel.app/', icon: 'https://cdn-icons-png.flaticon.com/512/4430/4430541.png' },
-                { name: 'Jack IPTV', desc: 'Player Ultra-Ligero', url: 'https://jack-iptv.com/', icon: 'https://cdn-icons-png.flaticon.com/512/3075/3075908.png' }
+                { name: 'OTTPlayer', desc: 'El más estable', url: 'https://ottplayer.tv/soft/browser', icon: 'https://cdn-icons-png.flaticon.com/512/3075/3075908.png' },
+                { name: 'Xtream Web', desc: 'Login Manual', url: 'http://webtv.iptvsmarters.com/', icon: 'https://cdn-icons-png.flaticon.com/512/3075/3075908.png' }
             ],
             sports: [
                 { name: 'Pirlo TV', desc: 'Fútbol y Más', url: 'https://www.pirlotv.fr', icon: 'https://cdn-icons-png.flaticon.com/512/888/888846.png' },
-                { name: 'RojaDirecta', desc: 'Eventos en Vivo', url: 'https://www.rojadirectatv.top', icon: 'https://cdn-icons-png.flaticon.com/512/888/888846.png' },
-                { name: 'TikiTaka', desc: 'La Casa del Fútbol', url: 'https://www.lacasadeltikitaka.net', icon: 'https://cdn-icons-png.flaticon.com/512/3306/3306567.png' }
-            ],
-            anime: [
-                { name: 'AnimeFLV', desc: 'Estrenos Diarios', url: 'https://www3.animeflv.net/', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' },
-                { name: 'JKAnime', desc: 'Extenso Catálogo', url: 'https://jkanime.net/', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
+                { name: 'RojaDirecta', desc: 'Eventos en Vivo', url: 'https://www.rojadirectatv.top', icon: 'https://cdn-icons-png.flaticon.com/512/888/888846.png' }
             ],
             web: [
                 { name: 'HDFull Directorio', desc: 'Mirrors Actualizados', url: 'https://dominioshdfull.com', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
-                { name: 'HDFull .cx', desc: 'Mirror Estable', url: 'https://hdfull.cx', icon: 'https://cdn-icons-png.flaticon.com/512/3163/3163508.png' },
-                { name: 'Photocall TV', desc: 'TDT y Canales Int.', url: 'https://photocall.tv', icon: 'https://cdn-icons-png.flaticon.com/512/716/716429.png' },
-                { name: 'Votark (FR)', desc: 'Cine sin Registro', url: 'https://votark.com', icon: 'https://cdn-icons-png.flaticon.com/512/197/197560.png' }
-            ],
-            retro: [
-                { name: 'RetroGames.cc', desc: 'Juega en tu PS4', url: 'https://www.retrogames.cc/', icon: 'https://cdn-icons-png.flaticon.com/512/141/141440.png' }
-            ],
-            vpn: [
-                { name: 'IPVanish Login', desc: 'Gestión de VPN', url: 'https://account.ipvanish.com/', icon: 'https://cdn-icons-png.flaticon.com/512/2092/2092202.png' },
-                { name: '1.1.1.1 DNS', desc: 'Salto de Bloqueos', url: 'https://1.1.1.1/', icon: 'https://cdn-icons-png.flaticon.com/512/3256/3256783.png' }
+                { name: 'Photocall TV', desc: 'TDT Online', url: 'https://photocall.tv', icon: 'https://cdn-icons-png.flaticon.com/512/716/716429.png' }
             ]
         };
 
-        let currentSection = 'cast', currentIndex = 0;
-        const sectionOrder = ['github', 'cast', 'debrid', 'iptv', 'sports', 'anime', 'web', 'retro', 'vpn'];
+        let currentSection = 'my-iptv', currentIndex = 0;
+        const sectionOrder = ['config', 'github', 'my-iptv', 'cast', 'debrid', 'iptv', 'sports', 'web'];
+
+        function loadSavedIptv() {
+            const url = localStorage.getItem('iptv_url');
+            const user = localStorage.getItem('iptv_user');
+            const pass = localStorage.getItem('iptv_pass');
+
+            if (url && user && pass) {
+                // Construir URL de M3U para el reproductor universal
+                const m3uUrl = `${url}/get.php?username=${user}&password=${pass}&type=m3u_plus&output=ts`;
+                const playerUrl = `https://iptvplayer.stream/?url=${encodeURIComponent(m3uUrl)}`;
+                
+                sections['my-iptv'] = [{
+                    name: 'CONECTAR A MI IPTV',
+                    desc: 'Carga automática de canales',
+                    url: playerUrl,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/716/716429.png'
+                }];
+                
+                // Rellenar inputs por si quiere editarlos
+                document.getElementById('iptv-url').value = url;
+                document.getElementById('iptv-user').value = user;
+                document.getElementById('iptv-pass').value = pass;
+            } else {
+                sections['my-iptv'] = [{
+                    name: 'SIN CONFIGURAR',
+                    desc: 'Pulsa Triángulo para configurar',
+                    url: '#',
+                    icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828843.png'
+                }];
+            }
+        }
+
+        function saveIptv() {
+            localStorage.setItem('iptv_url', document.getElementById('iptv-url').value);
+            localStorage.setItem('iptv_user', document.getElementById('iptv-user').value);
+            localStorage.setItem('iptv_pass', document.getElementById('iptv-pass').value);
+            alert("¡Datos guardados! Ahora puedes pulsar en 'CONECTAR A MI IPTV'.");
+            toggleConfig();
+            loadSavedIptv();
+            renderAll();
+        }
+
+        function toggleConfig() {
+            const panel = document.getElementById('iptv-config-panel');
+            panel.classList.toggle('show');
+        }
 
         function renderAll() {
+            document.getElementById('btn-config').className = (currentSection === 'config' ? 'nav-btn active' : 'nav-btn');
             document.getElementById('btn-github').className = (currentSection === 'github' ? 'nav-btn active' : 'nav-btn');
 
             Object.keys(sections).forEach(secId => {
@@ -251,12 +266,8 @@
                     const card = document.createElement('div');
                     const isActive = (currentSection === secId && index === currentIndex);
                     card.className = 'site-card' + (isActive ? ' active' : '');
-                    card.innerHTML = `
-                        <img src="${site.icon}">
-                        <h2>${site.name}</h2>
-                        <p>${site.desc}</p>
-                    `;
-                    card.onclick = () => { window.location.href = site.url; };
+                    card.innerHTML = `<img src="${site.icon}"><h2>${site.name}</h2><p>${site.desc}</p>`;
+                    card.onclick = () => { if(site.url !== '#') window.location.href = site.url; };
                     container.appendChild(card);
                 });
             });
@@ -267,37 +278,38 @@
         document.addEventListener('keydown', (e) => {
             const keyCode = e.keyCode || e.which;
             const isEnter = (keyCode === 13 || keyCode === 32 || keyCode === 0);
+            
+            if (keyCode === 38222) { toggleConfig(); return; } // Triángulo en algunos navegadores
+
             const currentList = sections[currentSection] || [];
 
             if (keyCode === 39) { // Derecha
-                if (currentSection === 'github') { currentSection = 'cast'; currentIndex = 0; }
+                if (currentSection === 'config') { currentSection = 'github'; }
+                else if (currentSection === 'github') { currentSection = 'my-iptv'; currentIndex = 0; }
                 else currentIndex = (currentIndex + 1) % currentList.length;
             } 
             else if (keyCode === 37) { // Izquierda
                 if (currentIndex > 0) currentIndex--;
-                else if (currentSection !== 'github') { currentSection = 'github'; }
+                else if (currentSection === 'my-iptv') { currentSection = 'github'; }
+                else if (currentSection === 'github') { currentSection = 'config'; }
             }
             else if (keyCode === 40) { // Abajo
                 let idx = sectionOrder.indexOf(currentSection);
-                if (idx < sectionOrder.length - 1) { 
-                    currentSection = sectionOrder[idx + 1]; 
-                    currentIndex = 0; 
-                }
+                if (idx < sectionOrder.length - 1) { currentSection = sectionOrder[idx + 1]; currentIndex = 0; }
             }
             else if (keyCode === 38) { // Arriba
                 let idx = sectionOrder.indexOf(currentSection);
-                if (idx > 0) { 
-                    currentSection = sectionOrder[idx - 1]; 
-                    currentIndex = 0; 
-                }
+                if (idx > 0) { currentSection = sectionOrder[idx - 1]; currentIndex = 0; }
             }
-            else if (isEnter) { // X
-                if (currentSection === 'github') window.location.href = "https://github.com/leocachondeo";
-                else window.location.href = currentList[currentIndex].url;
+            else if (isEnter) {
+                if (currentSection === 'config') toggleConfig();
+                else if (currentSection === 'github') window.location.href = "https://github.com/leocachondeo";
+                else if (currentList[currentIndex].url !== '#') window.location.href = currentList[currentIndex].url;
             }
             renderAll();
         });
 
+        loadSavedIptv();
         renderAll();
     </script>
 </body>
