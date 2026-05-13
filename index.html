@@ -7,40 +7,90 @@
     <title>CineStream PS4 - Privado y Automático</title>
     <style>
         :root { --primary: #E50914; --bg: #0A0A0A; --card-bg: #1A1A1A; --text: #F5F5F5; --vpn: #00FF99; --iptv: #FFA500; }
-        body { background-color: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 40px; overflow-y: auto; }
+        body { background-color: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 25px; overflow-y: auto; }
         
-        header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 40px; display: flex; align-items: center; justify-content: space-between; }
-        h1 { margin: 0; font-size: 2.5rem; text-transform: uppercase; letter-spacing: 5px; color: var(--primary); flex-grow: 1; text-align: center; }
+        header { border-bottom: 3px solid var(--primary); padding-bottom: 10px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; }
+        h1 { margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 3px; color: var(--primary); flex-grow: 1; text-align: center; }
         
-        .nav-btn { background: #222; color: white; text-decoration: none; padding: 12px 25px; border-radius: 10px; border: 1px solid #444; font-weight: bold; font-size: 1.1rem; }
-        .nav-btn.active { border-color: var(--primary); background: #333; box-shadow: 0 0 15px rgba(229, 9, 20, 0.5); }
+        .nav-btn { background: #222; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; border: 1px solid #444; font-weight: bold; font-size: 1rem; }
+        .nav-btn.active { border-color: var(--primary); background: #333; box-shadow: 0 0 12px rgba(229, 9, 20, 0.5); }
         .nav-btn.sync { border-color: var(--vpn); color: var(--vpn); }
 
-        .section-header { color: #FFD700; font-size: 2rem; margin: 50px 0 25px 0; border-left: 6px solid var(--primary); padding-left: 20px; text-transform: uppercase; }
-        .container { display: flex; gap: 25px; flex-wrap: wrap; }
+        .section-header { color: #FFD700; font-size: 1.6rem; margin: 30px 0 20px 0; border-left: 5px solid var(--primary); padding-left: 15px; text-transform: uppercase; }
+        .container { display: flex; gap: 20px; flex-wrap: wrap; }
         
-        .site-card { background: var(--card-bg); width: 320px; padding: 30px; border-radius: 15px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.1s; cursor: pointer; }
-        .site-card.active { border-color: var(--primary); transform: scale(1.05); background: #222; box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); z-index: 10; }
+        .site-card { background: var(--card-bg); width: 260px; padding: 20px; border-radius: 12px; text-decoration: none; color: white; border: 3px solid transparent; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.1s; cursor: pointer; }
+        .site-card img { width: 80px; height: 80px; margin-bottom: 10px; }
+        .site-card h2 { font-size: 1.2rem; margin: 10px 0; }
+        .site-card.active { border-color: var(--primary); transform: scale(1.05); background: #222; box-shadow: 0 10px 25px rgba(229, 9, 20, 0.4); z-index: 10; }
         
-        .credentials-box { background: #000; border: 1px solid #333; padding: 15px; margin-top: 15px; border-radius: 10px; font-family: monospace; font-size: 1.1rem; display: none; text-align: left; width: 100%; color: var(--vpn); }
+        .credentials-box { background: #000; border: 1px solid #333; padding: 10px; margin-top: 10px; border-radius: 8px; font-family: monospace; font-size: 0.9rem; display: none; text-align: left; width: 100%; color: var(--vpn); line-height: 1.4; }
         .active .credentials-box { display: block; }
 
-        #config-msg { position: fixed; top: 110px; right: 40px; font-weight: bold; padding: 10px; border-radius: 5px; z-index: 100; }
-        .controls-hint { position: fixed; bottom: 30px; right: 50px; background: rgba(0,0,0,0.8); padding: 15px 35px; border-radius: 50px; border: 1px solid var(--primary); }
-        input[type="file"] { display: none; }
+        #config-msg { position: fixed; top: 90px; right: 30px; font-weight: bold; padding: 8px; border-radius: 5px; z-index: 100; font-size: 0.9rem; }
+        .controls-hint { position: fixed; bottom: 20px; right: 30px; background: rgba(0,0,0,0.85); padding: 10px 25px; border-radius: 50px; border: 1px solid var(--primary); font-size: 0.9rem; }
+
+        /* Modal Styles */
+        #config-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        .modal-content { background: #1a1a1a; padding: 30px; border-radius: 20px; border: 2px solid var(--primary); width: 800px; }
+        .modal-content h2 { color: var(--primary); margin-top: 0; text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9rem; }
+        .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: white; border-radius: 5px; font-size: 1.1rem; box-sizing: border-box; }
+        .input-group input.focused { border-color: var(--primary); background: #222; outline: none; }
+        .modal-actions { display: flex; gap: 20px; justify-content: center; margin-top: 25px; }
+        .modal-btn { padding: 15px 40px; border-radius: 10px; font-weight: bold; cursor: pointer; border: 2px solid transparent; font-size: 1.1rem; }
+        .modal-btn.save { background: var(--primary); color: white; }
+        .modal-btn.cancel { background: #333; color: white; }
+        .modal-btn.focused { border-color: white; transform: scale(1.05); }
     </style>
 </head>
 <body>
     <header>
         <a href="https://github.com/leocachondeo" class="nav-btn" id="btn-github">📁 MI GITHUB</a>
         <h1>CineStream PS4</h1>
-        <label class="nav-btn sync" id="btn-sync">
-            🔄 SINCRONIZAR USB
-            <input type="file" id="file-input" accept=".json">
-        </label>
+        <button class="nav-btn sync" id="btn-sync">⚙️ CONFIGURAR</button>
     </header>
 
     <div id="config-msg"></div>
+
+    <div id="config-modal">
+        <div class="modal-content">
+            <h2>CONFIGURACIÓN PRIVADA</h2>
+            <div class="input-group">
+                <label>AllDebrid API Key</label>
+                <input type="text" id="inp-debrid" placeholder="Tu API Key de AllDebrid">
+            </div>
+            <div style="display: flex; gap: 20px;">
+                <div class="input-group" style="flex: 1;">
+                    <label>IPVanish User</label>
+                    <input type="text" id="inp-vpn-user" placeholder="Email">
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label>IPVanish Pass</label>
+                    <input type="text" id="inp-vpn-pass" placeholder="Password">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Xtream URL (IPTV)</label>
+                <input type="text" id="inp-xtream-url" placeholder="http://servidor.com:8080">
+            </div>
+            <div style="display: flex; gap: 20px;">
+                <div class="input-group" style="flex: 1;">
+                    <label>Xtream User</label>
+                    <input type="text" id="inp-xtream-user">
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label>Xtream Pass</label>
+                    <input type="text" id="inp-xtream-pass">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn save" id="btn-modal-save">GUARDAR ✅</button>
+                <button class="modal-btn cancel" id="btn-modal-cancel">CANCELAR ❌</button>
+            </div>
+        </div>
+    </div>
     
     <div class="section-header" style="color:var(--vpn); border-left-color:var(--vpn)">Seguridad y VPN (Privado)</div>
     <div class="container" id="vpn-container"></div>
@@ -77,7 +127,9 @@
         };
 
         let currentSection = 'vpn', currentIndex = 0;
+        let isModalOpen = false, modalFocusIndex = 0;
         const sectionOrder = ['github', 'sync', 'vpn', 'iptv', 'debrid', 'web'];
+        const modalInputs = ['inp-debrid', 'inp-vpn-user', 'inp-vpn-pass', 'inp-xtream-url', 'inp-xtream-user', 'inp-xtream-pass', 'btn-modal-save', 'btn-modal-cancel'];
 
         function updateState() {
             const msg = document.getElementById('config-msg');
@@ -95,11 +147,9 @@
         }
 
         function renderAll() {
-            // Actualizar botones de arriba
             document.getElementById('btn-github').className = (currentSection === 'github' ? 'nav-btn active' : 'nav-btn');
             document.getElementById('btn-sync').className = (currentSection === 'sync' ? 'nav-btn sync active' : 'nav-btn sync');
 
-            // Renderizar secciones
             ['vpn', 'iptv', 'debrid', 'web'].forEach(secId => {
                 const container = document.getElementById(secId + '-container');
                 container.innerHTML = '';
@@ -109,7 +159,7 @@
                     card.className = 'site-card' + (isActive ? ' active' : '');
                     let content = `<img src="${site.icon}"><h2>${site.name}</h2>`;
                     if (site.isVpn) {
-                        content += `<div class="credentials-box"><b>VPN PRIVADA:</b><br>USER: ${userConfig.ipvanish_user}<br>PASS: ${userConfig.ipvanish_pass}<br>PUERTO: 1080</div>`;
+                        content += `<div class="credentials-box"><b>VPN PRIVADA:</b><br>USER: ${userConfig.ipvanish_user}<br>PASS: ${userConfig.ipvanish_pass}<br>PORT: 1080</div>`;
                     }
                     card.innerHTML = content;
                     card.onclick = () => { window.location.href = site.url; };
@@ -117,25 +167,73 @@
                 });
             });
             const active = document.querySelector('.active');
-            if (active) active.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (active && !isModalOpen) active.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        document.getElementById('file-input').addEventListener('change', function(e) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                userConfig = JSON.parse(e.target.result);
-                localStorage.setItem('cs_data', JSON.stringify(userConfig));
-                alert("¡Configuración guardada en la PS4!");
-                updateState();
+        function toggleModal(show) {
+            isModalOpen = show;
+            document.getElementById('config-modal').style.display = show ? 'flex' : 'none';
+            if (show) {
+                document.getElementById('inp-debrid').value = userConfig.alldebrid_api;
+                document.getElementById('inp-vpn-user').value = userConfig.ipvanish_user;
+                document.getElementById('inp-vpn-pass').value = userConfig.ipvanish_pass;
+                document.getElementById('inp-xtream-url').value = userConfig.xtream_url;
+                document.getElementById('inp-xtream-user').value = userConfig.xtream_user;
+                document.getElementById('inp-xtream-pass').value = userConfig.xtream_pass;
+                modalFocusIndex = 0;
+                updateModalFocus();
+            }
+        }
+
+        function updateModalFocus() {
+            modalInputs.forEach((id, idx) => {
+                const el = document.getElementById(id);
+                if (idx === modalFocusIndex) {
+                    el.classList.add('focused');
+                    if (el.tagName === 'INPUT') el.focus();
+                } else {
+                    el.classList.remove('focused');
+                }
+            });
+        }
+
+        function saveConfig() {
+            userConfig = {
+                alldebrid_api: document.getElementById('inp-debrid').value,
+                ipvanish_user: document.getElementById('inp-vpn-user').value,
+                ipvanish_pass: document.getElementById('inp-vpn-pass').value,
+                xtream_url: document.getElementById('inp-xtream-url').value,
+                xtream_user: document.getElementById('inp-xtream-user').value,
+                xtream_pass: document.getElementById('inp-xtream-pass').value
             };
-            reader.readAsText(e.target.files[0]);
-        });
+            localStorage.setItem('cs_data', JSON.stringify(userConfig));
+            toggleModal(false);
+            updateState();
+        }
 
         document.addEventListener('keydown', (e) => {
             const keyCode = e.keyCode || e.which;
-            const currentList = sections[currentSection] || [1]; // Fallback para botones header
 
-            if (keyCode === 38222) { // Triángulo: Borrar
+            if (isModalOpen) {
+                if (keyCode === 40) { // Abajo
+                    modalFocusIndex = Math.min(modalFocusIndex + 1, modalInputs.length - 1);
+                    updateModalFocus();
+                } else if (keyCode === 38) { // Arriba
+                    modalFocusIndex = Math.max(modalFocusIndex - 1, 0);
+                    updateModalFocus();
+                } else if (keyCode === 13) { // X
+                    const activeId = modalInputs[modalFocusIndex];
+                    if (activeId === 'btn-modal-save') saveConfig();
+                    else if (activeId === 'btn-modal-cancel') toggleModal(false);
+                } else if (keyCode === 27) { // Circle / Esc
+                    toggleModal(false);
+                }
+                return;
+            }
+
+            const currentList = sections[currentSection] || [1];
+
+            if (keyCode === 38222) { // Triángulo
                 if(confirm("¿Borrar contraseñas de la memoria de la PS4?")) {
                     localStorage.removeItem('cs_data');
                     location.reload();
@@ -162,7 +260,7 @@
             }
             else if (keyCode === 13) { // X
                 if (currentSection === 'github') window.location.href = "https://github.com/leocachondeo";
-                else if (currentSection === 'sync') document.getElementById('file-input').click();
+                else if (currentSection === 'sync') toggleModal(true);
                 else window.location.href = currentList[currentIndex].url;
             }
             renderAll();
