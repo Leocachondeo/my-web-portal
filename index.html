@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -47,9 +46,9 @@
 </head>
 <body>
     <header>
-        <a href="https://github.com/leocachondeo" class="nav-btn" id="btn-github">📁 MI GITHUB</a>
+        <a href="https://github.com/leocachondeo" class="nav-btn" id="btn-github" onclick="window.location.href=this.href; return false;">📁 MI GITHUB</a>
         <h1>CineStream PS4</h1>
-        <button class="nav-btn sync" id="btn-sync">⚙️ CONFIGURAR</button>
+        <button class="nav-btn sync" id="btn-sync" onclick="toggleModal(true)">⚙️ CONFIGURAR</button>
     </header>
 
     <div id="config-msg"></div>
@@ -86,8 +85,8 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="modal-btn save" id="btn-modal-save">GUARDAR ✅</button>
-                <button class="modal-btn cancel" id="btn-modal-cancel">CANCELAR ❌</button>
+                <button class="modal-btn save" id="btn-modal-save" onclick="saveConfig()">GUARDAR ✅</button>
+                <button class="modal-btn cancel" id="btn-modal-cancel" onclick="toggleModal(false)">CANCELAR ❌</button>
             </div>
         </div>
     </div>
@@ -174,12 +173,12 @@
             isModalOpen = show;
             document.getElementById('config-modal').style.display = show ? 'flex' : 'none';
             if (show) {
-                document.getElementById('inp-debrid').value = userConfig.alldebrid_api;
-                document.getElementById('inp-vpn-user').value = userConfig.ipvanish_user;
-                document.getElementById('inp-vpn-pass').value = userConfig.ipvanish_pass;
-                document.getElementById('inp-xtream-url').value = userConfig.xtream_url;
-                document.getElementById('inp-xtream-user').value = userConfig.xtream_user;
-                document.getElementById('inp-xtream-pass').value = userConfig.xtream_pass;
+                document.getElementById('inp-debrid').value = userConfig.alldebrid_api || "";
+                document.getElementById('inp-vpn-user').value = userConfig.ipvanish_user || "";
+                document.getElementById('inp-vpn-pass').value = userConfig.ipvanish_pass || "";
+                document.getElementById('inp-xtream-url').value = userConfig.xtream_url || "";
+                document.getElementById('inp-xtream-user').value = userConfig.xtream_user || "";
+                document.getElementById('inp-xtream-pass').value = userConfig.xtream_pass || "";
                 modalFocusIndex = 0;
                 updateModalFocus();
             }
@@ -213,6 +212,7 @@
 
         document.addEventListener('keydown', (e) => {
             const keyCode = e.keyCode || e.which;
+            const isEnter = (keyCode === 13 || keyCode === 32 || keyCode === 0);
 
             if (isModalOpen) {
                 if (keyCode === 40) { // Abajo
@@ -221,7 +221,7 @@
                 } else if (keyCode === 38) { // Arriba
                     modalFocusIndex = Math.max(modalFocusIndex - 1, 0);
                     updateModalFocus();
-                } else if (keyCode === 13) { // X
+                } else if (isEnter) { // X
                     const activeId = modalInputs[modalFocusIndex];
                     if (activeId === 'btn-modal-save') saveConfig();
                     else if (activeId === 'btn-modal-cancel') toggleModal(false);
@@ -258,7 +258,7 @@
                 let idx = sectionOrder.indexOf(currentSection);
                 if (idx > 0) { currentSection = sectionOrder[idx - 1]; currentIndex = 0; }
             }
-            else if (keyCode === 13) { // X
+            else if (isEnter) { // X
                 if (currentSection === 'github') window.location.href = "https://github.com/leocachondeo";
                 else if (currentSection === 'sync') toggleModal(true);
                 else window.location.href = currentList[currentIndex].url;
